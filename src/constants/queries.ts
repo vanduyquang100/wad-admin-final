@@ -1,0 +1,4 @@
+export const QUERY_PARAMS = {
+  ME: 'QUERY.ME',
+  ALL_USERS: 'QUERY.ALL_USERS',
+}
