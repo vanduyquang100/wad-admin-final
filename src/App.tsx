@@ -1,35 +1,49 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { lazy } from "react";
+import {
+  Navigate,
+  Route,
+  BrowserRouter as Router,
+  Routes,
+} from "react-router-dom";
+import { NAVIGATION_ROUTES } from "@/constants/apis";
+import { PrivateWrapper } from "./components/pages/PrivateWrapper";
+import { DashboardLayout } from "@/components/ui";
+
+const LogInPage = lazy(() => import("@/components/pages/LogInPage"));
+const UserListPage = lazy(() => import("@/components/pages/UserListPage"));
+const ProductListPage = lazy(
+  () => import("@/components/pages/ProductListPage")
+);
+const OrderListPage = lazy(() => import("@/components/pages/OrderListPage"));
+const ReportListPage = lazy(() => import("@/components/pages/ReportPage"));
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Router>
+      <Routes>
+        <Route path="/" Component={PrivateWrapper}>
+          <Route path={NAVIGATION_ROUTES.DASHBOARD} Component={DashboardLayout}>
+            <Route
+              path={NAVIGATION_ROUTES.DASHBOARD}
+              element={<Navigate to={NAVIGATION_ROUTES.USERS} />}
+            />
+            <Route path={NAVIGATION_ROUTES.USERS} Component={UserListPage} />
+            <Route
+              path={NAVIGATION_ROUTES.PRODUCTS}
+              Component={ProductListPage}
+            />
+            <Route path={NAVIGATION_ROUTES.ORDERS} Component={OrderListPage} />
+            <Route
+              path={NAVIGATION_ROUTES.REPORTS}
+              Component={ReportListPage}
+            />
+          </Route>
+        </Route>
+        <Route path="/" Component={LogInPage} />
+        <Route path={NAVIGATION_ROUTES.LOGIN} Component={LogInPage} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
