@@ -4,4 +4,5 @@ type User = {
   email: string;
   roles: string[];
   _id: string;
+  bannedTimestamp?: number;
 };

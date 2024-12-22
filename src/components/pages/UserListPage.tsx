@@ -2,11 +2,19 @@ import {
   Badge,
   BasicLayout,
   Button,
+  Form,
+  FormField,
+  Input,
   Pagination,
   PaginationContent,
   PaginationItem,
   PaginationNext,
   PaginationPrevious,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Table,
   TableBody,
   TableCell,
@@ -19,8 +27,29 @@ import LoadingPage from "./LoadingPage";
 import { Link, useSearchParams } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { NAVIGATION_ROUTES } from "@/constants/apis";
+import { useForm } from "react-hook-form";
 
 const PAGE_LIMIT = 10;
+
+enum FilterColumns {
+  NAME = "name",
+  EMAIL = "email",
+}
+
+enum FilterInputs {
+  FILTER_TYPE = "filter_type",
+  FILTER_TEXT = "filter_text",
+}
+
+type FilterFormType = {
+  [FilterInputs.FILTER_TYPE]: FilterColumns;
+  [FilterInputs.FILTER_TEXT]?: string;
+};
+
+const defaultFilterFormValues: FilterFormType = {
+  [FilterInputs.FILTER_TYPE]: FilterColumns.NAME,
+  [FilterInputs.FILTER_TEXT]: undefined,
+};
 
 export const UserListPage = () => {
   const [params] = useSearchParams();
@@ -28,6 +57,12 @@ export const UserListPage = () => {
   const [sortBy, setSortBy] = useState<[string, boolean] | undefined>(
     undefined
   );
+  const [seachValue, setSearchValue] = useState<FilterFormType>(
+    defaultFilterFormValues
+  );
+  const filterMethods = useForm<FilterFormType>({
+    defaultValues: defaultFilterFormValues,
+  });
 
   const setSortCallback = useCallback(
     (sortColumn: string) => () => {
@@ -47,6 +82,9 @@ export const UserListPage = () => {
   const setSortCreatedDate = useCallback(setSortCallback("createdAt"), [
     setSortCallback,
   ]);
+  const handleFilterFormSubmit = useCallback((data: FilterFormType) => {
+    setSearchValue(data);
+  }, []);
 
   useEffect(() => {
     setPage(parseInt(params.get("page") ?? "1"));
@@ -58,7 +96,11 @@ export const UserListPage = () => {
       limit: PAGE_LIMIT,
       sortBy: sortBy ? sortBy[0] : undefined,
       sortOrder: sortBy && sortBy[1] ? "asc" : "desc",
+      ...(seachValue?.[FilterInputs.FILTER_TYPE] === FilterColumns.NAME
+        ? { name: seachValue?.[FilterInputs.FILTER_TEXT] }
+        : { email: seachValue?.[FilterInputs.FILTER_TEXT] }),
     },
+    refetchOnWindowFocus: false,
   });
 
   if (isFetching) {
@@ -66,7 +108,45 @@ export const UserListPage = () => {
   }
   return (
     <BasicLayout className="p-8 w-full">
-      <h1 className="mb-8">User List</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1>User List</h1>
+        <Form {...filterMethods}>
+          <form
+            onSubmit={filterMethods.handleSubmit(handleFilterFormSubmit)}
+            className="flex space-x-2 items-center"
+          >
+            <FormField
+              control={filterMethods.control}
+              name={FilterInputs.FILTER_TYPE}
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  name={field.name}
+                  onValueChange={field.onChange}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Search for name" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={FilterColumns.NAME}>
+                      Search for name
+                    </SelectItem>
+                    <SelectItem value={FilterColumns.EMAIL}>
+                      Search for email
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            <FormField
+              control={filterMethods.control}
+              name={FilterInputs.FILTER_TEXT}
+              render={({ field }) => <Input placeholder="Search" {...field} />}
+            />
+            <Button variant="secondary">Search</Button>
+          </form>
+        </Form>
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
@@ -75,18 +155,18 @@ export const UserListPage = () => {
               <Button
                 variant="ghost"
                 className="w-full justify-start"
-                onClick={setSortEmail}
+                onClick={setSortName}
               >
-                Email
+                Name
               </Button>
             </TableHead>
             <TableHead>
               <Button
                 variant="ghost"
                 className="w-full justify-start"
-                onClick={setSortName}
+                onClick={setSortEmail}
               >
-                Name
+                Email
               </Button>
             </TableHead>
             <TableHead align="center">Roles</TableHead>
@@ -112,10 +192,12 @@ export const UserListPage = () => {
                   <Link
                     to={NAVIGATION_ROUTES.USER_DETAIL.replace(":id", user._id)}
                   >
-                    {user.email}
+                    <p className={user.bannedTimestamp ? "text-red-500" : ""}>
+                      {user.name} {!!user.bannedTimestamp && "(Banned)"}
+                    </p>
                   </Link>
                 </TableCell>
-                <TableCell>{user.name}</TableCell>
+                <TableCell>{user.email}</TableCell>
                 <TableCell>
                   {user.roles.map((role) => (
                     <Badge key={role} variant="secondary">

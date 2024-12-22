@@ -6,5 +6,6 @@ export const useUserInfo = () => {
   return useQuery({
     queryKey: [QUERY_PARAMS.ME],
     queryFn: authenticationService.me,
+    refetchOnWindowFocus: false,
   });
 };
