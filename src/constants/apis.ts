@@ -12,6 +12,7 @@ export const NAVIGATION_ROUTES = {
   LOGIN: '/login',
   DASHBOARD: '/dashboard',
   USERS: '/dashboard/users',
+  USER_DETAIL: '/dashboard/users/:id',
   PRODUCTS: '/dashboard/products',
   ORDERS: '/dashboard/orders',
   REPORTS: '/dashboard/reports',
