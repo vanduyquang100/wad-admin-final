@@ -1,5 +1,5 @@
 import { API_ROUTES } from "@/constants/apis";
-import { axiosInstance } from "../client";
+import { axiosInstance } from "./client";
 import { UserRoles } from "@/constants/global";
 
 export interface GetAllUserFilters {

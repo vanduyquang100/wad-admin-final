@@ -1,5 +1,5 @@
 import { API_ROUTES } from "@/constants/apis";
-import { axiosInstance } from "../client";
+import { axiosInstance } from "./client";
 
 class AuthenticationService {
   async logIn(props: { email: string; password: string }) {

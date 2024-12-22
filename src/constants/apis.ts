@@ -4,8 +4,9 @@ export const API_ROUTES = {
   LOGIN: 'users/login',
   ME: 'users/me',
   ALL_USERS: 'users',
-  GET_USER: '/users/:id',
-  UPDATE_USER: '/users/:id'
+  GET_USER: 'users/:id',
+  UPDATE_USER: 'users/:id',
+  ALL_PRODUCTS: 'products'
 };
 
 export const NAVIGATION_ROUTES = {
@@ -16,4 +17,5 @@ export const NAVIGATION_ROUTES = {
   PRODUCTS: '/dashboard/products',
   ORDERS: '/dashboard/orders',
   REPORTS: '/dashboard/reports',
+  PRODUCT_DETAIL: '/dashboard/products/:id',
 }
