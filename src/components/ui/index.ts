@@ -14,3 +14,4 @@ export * from './separator.tsx';
 export * from './badge.tsx';
 export * from './pagination.tsx';
 export * from './select.tsx';
+export * from './textarea.tsx';
