@@ -29,6 +29,7 @@ import { useCallback, useEffect, useState } from "react";
 import { NAVIGATION_ROUTES } from "@/constants/apis";
 import { useForm } from "react-hook-form";
 import { formatPrice } from "@/lib/utils";
+import { Edit, Plus, Trash } from "lucide-react";
 
 const PAGE_LIMIT = 10;
 
@@ -94,10 +95,6 @@ export const ProductListPage = () => {
     setSearchValue(data);
   }, []);
 
-  useEffect(() => {
-    setPage(parseInt(params.get("page") ?? "1"));
-  }, [params]);
-
   const { data, isFetching } = useProducts({
     filters: {
       page: page,
@@ -111,13 +108,25 @@ export const ProductListPage = () => {
     refetchOnWindowFocus: false,
   });
 
+  useEffect(() => {
+    setPage(parseInt(params.get("page") ?? "1"));
+  }, [params]);
+
   if (isFetching) {
     return <LoadingPage />;
   }
   return (
     <BasicLayout className="p-8 w-full">
       <div className="flex justify-between items-center mb-8">
-        <h1>Product List</h1>
+        <div className="flex items-center space-x-4">
+          <h1>Product List</h1>
+          <Link to={NAVIGATION_ROUTES.CREATE_PRODUCT}>
+            <Button variant="outline" className="rounded-full">
+              <Plus size="1rem" />
+              <p>Create Product</p>
+            </Button>
+          </Link>
+        </div>
         <Form {...filterMethods}>
           <form
             onSubmit={filterMethods.handleSubmit(handleFilterFormSubmit)}
@@ -213,6 +222,7 @@ export const ProductListPage = () => {
                 Created Date
               </Button>
             </TableHead>
+            <TableHead />
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -246,6 +256,16 @@ export const ProductListPage = () => {
                 <TableCell className="text-right">{product.stock}</TableCell>
                 <TableCell>
                   {new Date(product.createdAt).toLocaleString()}
+                </TableCell>
+                <TableCell>
+                  <div className="flex space-x-2">
+                    <Button data-product-id={product._id} variant="outline">
+                      <Edit size="1rem" />
+                    </Button>
+                    <Button data-product-id={product._id} variant="outline">
+                      <Trash className="stroke-red-500" size="1rem" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

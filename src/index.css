@@ -79,6 +79,10 @@
     @apply border-border;
   }
 
+  .border-1 {
+    @apply border-[1px];
+  }
+
   h1 {
     font-size: x-large;
     font-weight: 500;

@@ -24,6 +24,16 @@ export interface AllProductsResponse {
   hasNextPage: boolean;
 }
 
+export interface CreateProductRequest {
+  name: string;
+  description: string;
+  detailDescription: string;
+  price: number;
+  category: string;
+  imageUrl: string;
+  stock: number;
+}
+
 class ProductService {
   async getAllProducts(filter: GetAllProductsFilters): Promise<AllProductsResponse> {
     const result = await axiosInstance.get<AllProductsResponse>(
@@ -34,6 +44,13 @@ class ProductService {
     )
 
     return result.data;
+  }
+
+  async createProduct(request: CreateProductRequest) {
+    return axiosInstance.post(
+      API_ROUTES.CREATE_PRODUCT,
+      request
+    )
   }
 }
 
