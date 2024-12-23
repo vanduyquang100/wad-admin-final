@@ -7,7 +7,8 @@ export const API_ROUTES = {
   GET_USER: 'users/:id',
   UPDATE_USER: 'users/:id',
   ALL_PRODUCTS: 'products',
-  CREATE_PRODUCT: 'products'
+  CREATE_PRODUCT: 'products',
+  DELETE_PRODUCT: 'products/:id'
 };
 
 export const NAVIGATION_ROUTES = {
@@ -20,4 +21,5 @@ export const NAVIGATION_ROUTES = {
   REPORTS: '/dashboard/reports',
   CREATE_PRODUCT: '/dashboard/products/create',
   PRODUCT_DETAIL: '/dashboard/products/:id',
+  EDIT_PRODUCT: '/dashboard/products/edit/:id',
 }

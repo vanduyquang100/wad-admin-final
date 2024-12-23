@@ -25,11 +25,12 @@ import {
 import { useProducts } from "@/hooks";
 import LoadingPage from "./LoadingPage";
 import { Link, useSearchParams } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
+import { MouseEvent, useCallback, useEffect, useState } from "react";
 import { NAVIGATION_ROUTES } from "@/constants/apis";
 import { useForm } from "react-hook-form";
 import { formatPrice } from "@/lib/utils";
 import { Edit, Plus, Trash } from "lucide-react";
+import { useDeleteProduct } from "@/hooks/useDeleteProduct";
 
 const PAGE_LIMIT = 10;
 
@@ -55,6 +56,7 @@ const defaultFilterFormValues: FilterFormType = {
 
 export const ProductListPage = () => {
   const [params] = useSearchParams();
+  const { mutate: deleteProduct } = useDeleteProduct();
   const [page, setPage] = useState(parseInt(params.get("page") ?? "1"));
   const [sortBy, setSortBy] = useState<[string, boolean] | undefined>(
     undefined
@@ -93,6 +95,17 @@ export const ProductListPage = () => {
   ]);
   const handleFilterFormSubmit = useCallback((data: FilterFormType) => {
     setSearchValue(data);
+  }, []);
+
+  const handleDeleteProduct = useCallback((event: MouseEvent) => {
+    const productId = event.currentTarget.getAttribute("data-product-id");
+    const userConfirmed = window.confirm(
+      "Are you sure you want to delete this product?"
+    );
+
+    if (userConfirmed) {
+      deleteProduct({ id: productId as unknown as string });
+    }
   }, []);
 
   const { data, isFetching } = useProducts({
@@ -259,10 +272,21 @@ export const ProductListPage = () => {
                 </TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
-                    <Button data-product-id={product._id} variant="outline">
-                      <Edit size="1rem" />
-                    </Button>
-                    <Button data-product-id={product._id} variant="outline">
+                    <Link
+                      to={NAVIGATION_ROUTES.EDIT_PRODUCT.replace(
+                        ":id",
+                        product._id
+                      )}
+                    >
+                      <Button data-product-id={product._id} variant="outline">
+                        <Edit size="1rem" />
+                      </Button>
+                    </Link>
+                    <Button
+                      data-product-id={product._id}
+                      variant="outline"
+                      onClick={handleDeleteProduct}
+                    >
                       <Trash className="stroke-red-500" size="1rem" />
                     </Button>
                   </div>

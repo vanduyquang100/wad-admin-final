@@ -34,6 +34,10 @@ export interface CreateProductRequest {
   stock: number;
 }
 
+export interface DeleteProductRequest {
+  id: string;
+}
+
 class ProductService {
   async getAllProducts(filter: GetAllProductsFilters): Promise<AllProductsResponse> {
     const result = await axiosInstance.get<AllProductsResponse>(
@@ -50,6 +54,12 @@ class ProductService {
     return axiosInstance.post(
       API_ROUTES.CREATE_PRODUCT,
       request
+    )
+  }
+
+  async deleteProduct(request: DeleteProductRequest) {
+    return axiosInstance.delete(
+      API_ROUTES.DELETE_PRODUCT.replace(":id", request.id),
     )
   }
 }
