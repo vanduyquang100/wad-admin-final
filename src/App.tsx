@@ -19,6 +19,9 @@ const ReportListPage = lazy(() => import("@/components/pages/ReportPage"));
 const CreateProductPage = lazy(
   () => import("@/components/pages/CreateProductPage")
 );
+const UpdateProductPage = lazy(
+  () => import("@/components/pages/UpdateProductPage")
+);
 
 function App() {
   return (
@@ -43,6 +46,10 @@ function App() {
             <Route
               path={NAVIGATION_ROUTES.CREATE_PRODUCT}
               Component={CreateProductPage}
+            />
+            <Route
+              path={NAVIGATION_ROUTES.EDIT_PRODUCT}
+              Component={UpdateProductPage}
             />
           </Route>
         </Route>
