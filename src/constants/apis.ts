@@ -8,7 +8,12 @@ export const API_ROUTES = {
   UPDATE_USER: 'users/:id',
   ALL_PRODUCTS: 'products',
   CREATE_PRODUCT: 'products',
-  DELETE_PRODUCT: 'products/:id'
+  UPDATE_PRODUCT: 'products/:id',
+  GET_PRODUCT: 'products/:id',
+  DELETE_PRODUCT: 'products/:id',
+  ALL_ORDERS: 'orders',
+  GET_ORDER: 'orders/:id',
+  UPDATE_ORDER: 'orders/:id',
 };
 
 export const NAVIGATION_ROUTES = {
