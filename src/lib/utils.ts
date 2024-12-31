@@ -14,5 +14,10 @@ export function formatPrice(price: number, currency: string = "VND") {
 };
 
 export function relativeServerLinkToURL(relativePath: string) {
-  return `${SERVER_API}${relativePath}`;
+  try {
+    new URL(relativePath);
+    return relativePath;
+  } catch {
+    return `${SERVER_API}${relativePath.substring(relativePath.indexOf("/") + 1)}`;
+  }
 }

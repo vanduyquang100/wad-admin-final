@@ -26,13 +26,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import LoadingPage from "./LoadingPage";
 import { NAVIGATION_ROUTES } from "@/constants/apis";
 import { formatPrice } from "@/lib/utils";
-
-enum FilterCategory {
-  PENDING = "pending",
-  COMPLETE = "complete",
-  ALL = "All",
-}
-
+import { FilterCategory } from "@/constants/enums/order";
 const PAGE_LIMIT = 10;
 
 export const OrderListPage = () => {
@@ -97,7 +91,7 @@ export const OrderListPage = () => {
             <TableHead className="text-center">Status</TableHead>
             <TableHead className="text-center">Price</TableHead>
             <TableHead>Payment Info</TableHead>
-            <TableHead className="text-center">User ID</TableHead>
+            <TableHead className="text-center">User</TableHead>
             <TableHead />
           </TableRow>
         </TableHeader>
@@ -110,7 +104,7 @@ export const OrderListPage = () => {
                 </TableCell>
                 <TableCell>
                   <Link
-                    to={NAVIGATION_ROUTES.PRODUCT_DETAIL.replace(
+                    to={NAVIGATION_ROUTES.ORDER_DETAIL.replace(
                       ":id",
                       order._id
                     )}
@@ -127,8 +121,8 @@ export const OrderListPage = () => {
                   {formatPrice(order.totalPrice)}
                 </TableCell>
                 <TableCell>{order.paymentInfo ?? "No payment info"}</TableCell>
-                <TableCell className="text-center font-mono text-sm">
-                  {order.userId}
+                <TableCell className="text-center text-sm">
+                  {order.userId.name}
                 </TableCell>
               </TableRow>
             ))}

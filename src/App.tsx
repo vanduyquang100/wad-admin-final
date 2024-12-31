@@ -22,6 +22,9 @@ const CreateProductPage = lazy(
 const UpdateProductPage = lazy(
   () => import("@/components/pages/UpdateProductPage")
 );
+const OrderDetailPage = lazy(
+  () => import("@/components/pages/OrderDetailPage")
+);
 
 function App() {
   return (
@@ -50,6 +53,10 @@ function App() {
             <Route
               path={NAVIGATION_ROUTES.EDIT_PRODUCT}
               Component={UpdateProductPage}
+            />
+            <Route
+              path={NAVIGATION_ROUTES.ORDER_DETAIL}
+              Component={OrderDetailPage}
             />
           </Route>
         </Route>
