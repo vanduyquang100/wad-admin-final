@@ -14,6 +14,7 @@ export const API_ROUTES = {
   ALL_ORDERS: 'orders',
   GET_ORDER: 'orders/:id',
   UPDATE_ORDER: 'orders/:id',
+  UPDATE_ORDER_STATUS: 'orders/:id/status',
 };
 
 export const NAVIGATION_ROUTES = {
@@ -27,4 +28,5 @@ export const NAVIGATION_ROUTES = {
   CREATE_PRODUCT: '/dashboard/products/create',
   PRODUCT_DETAIL: '/dashboard/products/:id',
   EDIT_PRODUCT: '/dashboard/products/edit/:id',
+  ORDER_DETAIL: '/dashboard/orders/:id',
 }
