@@ -247,7 +247,7 @@ export const ProductListPage = () => {
                 </TableCell>
                 <TableCell>
                   <Link
-                    to={NAVIGATION_ROUTES.PRODUCT_DETAIL.replace(
+                    to={NAVIGATION_ROUTES.EDIT_PRODUCT.replace(
                       ":id",
                       product._id
                     )}
