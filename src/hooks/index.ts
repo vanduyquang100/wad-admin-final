@@ -6,3 +6,4 @@ export * from './useProducts';
 export * from './useUpdateProduct';
 export * from './useProductDetail';
 export * from './useOrderDetail';
+export * from './useOrderRevenue';

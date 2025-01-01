@@ -28,6 +28,20 @@ export interface UpdateOrderStatusRequest {
   status: Exclude<FilterCategory, FilterCategory.ALL>;
 }
 
+export interface GetRevenueInTimeRange {
+  start: number;
+  end: number;
+}
+
+export interface RevenueDate {
+  date: string;
+  revenue: number;
+}
+
+export interface GetRevenueInTimeRangeResponse {
+  totalRevenue: RevenueDate[];
+}
+
 class OrderService {
   async getAllOrders(filter: GetAllOrdersFilters): Promise<AllOrdersResponse> {
     const result = await axiosInstance.get<AllOrdersResponse>(
@@ -54,6 +68,19 @@ class OrderService {
         status: request.status
       }
     )
+  }
+
+  async getRevenueInRange(request: GetRevenueInTimeRange): Promise<GetRevenueInTimeRangeResponse> {
+    const result = await axiosInstance.get<GetRevenueInTimeRangeResponse>(
+      API_ROUTES.GET_REVENUE,
+      {
+        params: {
+          ...request
+        }
+      }
+    )
+
+    return result.data;
   }
 }
 

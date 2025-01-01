@@ -80,8 +80,9 @@ export const DashboardSidebar: SidebarComponentType = () => {
             <SidebarMenuItem>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton>
-                    <User2 /> {user.name}
+                  <SidebarMenuButton className="max-w-full flex-nowrap">
+                    <User2 />
+                    <p className="overflow-hidden text-ellipsis">{user.name}</p>
                     <ChevronUp className="ml-auto" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
