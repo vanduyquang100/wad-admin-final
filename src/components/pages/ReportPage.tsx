@@ -3,7 +3,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
   RevenueChart,
@@ -14,8 +13,9 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
+  TopProductsPieChart,
 } from "@/components/ui";
-import { useOrderRevenue } from "@/hooks";
+import { useOrderRevenue, useTopProductRevenue } from "@/hooks";
 import { useState } from "react";
 import LoadingPage from "./LoadingPage";
 
@@ -40,7 +40,12 @@ export const UserListPage = () => {
     TimeRange.THIS_WEEK
   );
   const timeRangePair = timeRangeValues[timeRangeEnum];
-  const { data } = useOrderRevenue({
+  const { data: orderRevenueData } = useOrderRevenue({
+    start: timeRangePair[0],
+    end: timeRangePair[1],
+  });
+
+  const { data: productRevenueData } = useTopProductRevenue({
     start: timeRangePair[0],
     end: timeRangePair[1],
   });
@@ -49,10 +54,25 @@ export const UserListPage = () => {
     setTimeRangeEnum(value);
   };
   return (
-    <BasicLayout className="p-8">
+    <BasicLayout className="p-8 max-w-screen-lg">
       <h1>Reports</h1>
-      <div className="flex w-full my-4">
-        <Card className="w-1/2">
+      <Select value={timeRangeEnum} onValueChange={selectTimeRange}>
+        <SelectTrigger className="w-[180px] my-4">
+          <SelectValue placeholder="Select a status" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectLabel>Time Range</SelectLabel>
+            {Object.entries(TimeRange).map(([key, value]) => (
+              <SelectItem key={key} value={value}>
+                {value}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+      <div className="flex w-full my-4 flex-wrap gap-2">
+        <Card className="flex-grow max-w-[45%]">
           <CardHeader>
             <CardTitle>Revenue</CardTitle>
             <CardDescription>
@@ -62,29 +82,27 @@ export const UserListPage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {data ? (
-              <RevenueChart chartData={data?.totalRevenue} />
+            {orderRevenueData ? (
+              <RevenueChart chartData={orderRevenueData?.totalRevenue} />
             ) : (
               <LoadingPage />
             )}
           </CardContent>
-          <CardFooter>
-            <Select value={timeRangeEnum} onValueChange={selectTimeRange}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select a status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Time Range</SelectLabel>
-                  {Object.entries(TimeRange).map(([key, value]) => (
-                    <SelectItem key={key} value={value}>
-                      {value}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </CardFooter>
+        </Card>
+        <Card className="flex-grow max-w-[45%]">
+          <CardHeader>
+            <CardTitle>Top Products</CardTitle>
+            <CardDescription>
+              Top Revenue Products within the time range
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {productRevenueData ? (
+              <TopProductsPieChart chartData={productRevenueData} />
+            ) : (
+              <LoadingPage />
+            )}
+          </CardContent>
         </Card>
       </div>
     </BasicLayout>

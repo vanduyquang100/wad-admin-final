@@ -19,6 +19,13 @@ type Props = {
 };
 
 export const RevenueChart = ({ chartData }: Props) => {
+  if (chartData.length === 0) {
+    return (
+      <div className="w-full h-full flex justify-center items-center text-sm text-gray-600">
+        No Data
+      </div>
+    );
+  }
   return (
     <ChartContainer config={chartConfig}>
       <AreaChart

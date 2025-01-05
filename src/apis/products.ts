@@ -2,6 +2,7 @@
 import { API_ROUTES } from "@/constants/apis";
 import { axiosInstance } from "./client";
 import { relativeServerLinkToURL } from "@/lib/utils";
+import { ProductStatus } from "@/constants/enums/product";
 
 export interface GetAllProductsFilters extends Record<string, unknown> {
   page: number;
@@ -44,6 +45,7 @@ export interface UpdateProductRequest {
   category?: string;
   imageUrl?: string;
   stock?: number;
+  status?: string;
 }
 
 export interface DeleteProductRequest {
@@ -52,6 +54,10 @@ export interface DeleteProductRequest {
 
 export interface GetProductDetail {
   id: string;
+}
+
+export type GetProductResponse = Omit<Product, "status"> & {
+  status: ProductStatus;
 }
 class ProductService {
   async getAllProducts(filter: GetAllProductsFilters): Promise<AllProductsResponse> {
@@ -86,8 +92,8 @@ class ProductService {
     )
   }
 
-  async getProductDetail(request: GetProductDetail): Promise<Product> {
-    const result = await axiosInstance.get<Product>(
+  async getProductDetail(request: GetProductDetail): Promise<GetProductResponse> {
+    const result = await axiosInstance.get<GetProductResponse>(
       API_ROUTES.GET_PRODUCT.replace(":id", request.id)
     )
 

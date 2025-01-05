@@ -16,6 +16,8 @@ export const API_ROUTES = {
   UPDATE_ORDER: 'orders/:id',
   UPDATE_ORDER_STATUS: 'orders/:id/status',
   GET_REVENUE: 'orders/revenue',
+  GET_PRODUCT_REVENUE: 'products/revenue',
+  GET_USER_ORDERS: '/orders/users/:userId',
 };
 
 export const NAVIGATION_ROUTES = {
