@@ -5,6 +5,7 @@ type User = {
   roles: string[];
   _id: string;
   bannedTimestamp?: number;
+  profilePic?: string;
 };
 
 type Product = {
@@ -19,6 +20,7 @@ type Product = {
   createdAt: string;
   updatedAt: string;
   stock: number;
+  status: string;
 }
 
 type Order = {

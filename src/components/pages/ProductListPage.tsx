@@ -180,7 +180,8 @@ export const ProductListPage = () => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">No.</TableHead>
+            <TableHead className="w-[50px]">No.</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>
               <Button
                 variant="ghost"
@@ -244,6 +245,14 @@ export const ProductListPage = () => {
               <TableRow key={product._id}>
                 <TableCell className="font-medium">
                   {index + (page - 1) * PAGE_LIMIT + 1}
+                </TableCell>
+                <TableCell>
+                  <Badge
+                    variant="secondary"
+                    className="text-xs text-nowrap font-medium"
+                  >
+                    {product.status}
+                  </Badge>
                 </TableCell>
                 <TableCell>
                   <Link

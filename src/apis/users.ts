@@ -13,6 +13,10 @@ export interface GetAllUserFilters {
   includeBanned?: boolean;
 }
 
+export interface GetUserRequest {
+  id: string;
+}
+
 export interface AllUserResponse {
   total: number;
   page: number;
@@ -21,6 +25,8 @@ export interface AllUserResponse {
   users: User[];
 }
 
+export interface GetUserResponse extends User { }
+
 class UserService {
   async getAllUsers(filter: GetAllUserFilters): Promise<AllUserResponse> {
     const result = await axiosInstance.get<AllUserResponse>(
@@ -28,6 +34,14 @@ class UserService {
       {
         params: filter
       }
+    )
+
+    return result.data;
+  }
+
+  async getUser(request: GetUserRequest): Promise<GetUserResponse> {
+    const result = await axiosInstance.get<GetUserResponse>(
+      API_ROUTES.GET_USER.replace(":id", request.id),
     )
 
     return result.data;

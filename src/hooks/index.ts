@@ -7,3 +7,6 @@ export * from './useUpdateProduct';
 export * from './useProductDetail';
 export * from './useOrderDetail';
 export * from './useOrderRevenue';
+export * from './useTopProductRevenue';
+export * from './useGetUser';
+export * from './useUserOrders';

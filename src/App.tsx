@@ -11,6 +11,7 @@ import { DashboardLayout } from "@/components/ui";
 
 const LogInPage = lazy(() => import("@/components/pages/LogInPage"));
 const UserListPage = lazy(() => import("@/components/pages/UserListPage"));
+const UserDetailPage = lazy(() => import("@/components/pages/UserDetailPage"));
 const ProductListPage = lazy(
   () => import("@/components/pages/ProductListPage")
 );
@@ -37,6 +38,10 @@ function App() {
               element={<Navigate to={NAVIGATION_ROUTES.USERS} />}
             />
             <Route path={NAVIGATION_ROUTES.USERS} Component={UserListPage} />
+            <Route
+              path={NAVIGATION_ROUTES.USER_DETAIL}
+              Component={UserDetailPage}
+            />
             <Route
               path={NAVIGATION_ROUTES.PRODUCTS}
               Component={ProductListPage}

@@ -11,18 +11,34 @@ import {
   FormLabel,
   FormMessage,
   Input,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
   Textarea,
 } from "@/components/ui";
 import { useNavigate, useParams } from "react-router-dom";
 import { NAVIGATION_ROUTES } from "@/constants/apis";
 import { useCallback, useEffect } from "react";
 import { useUpdateProduct, useProductDetail } from "@/hooks";
+import { ProductStatus } from "@/constants/enums/product";
+
+const statusRender: Record<ProductStatus, string> = {
+  [ProductStatus.ON_STOCK]: "On stock",
+  [ProductStatus.OUT_OF_STOCK]: "Out of stock",
+  [ProductStatus.SUSPENDED]: "Suspended",
+  [ProductStatus.UPCOMING]: "Upcoming",
+};
 
 const formSchema = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
   detailDescription: z.string().optional(),
   category: z.string().optional(),
+  status: z.string().optional(),
   stock: z
     .string()
     .refine((val) => !Number.isNaN(parseInt(val, 10)), {
@@ -68,6 +84,7 @@ export const UpdateProductPage = () => {
         category: data.category,
         stock: data.stock.toString(),
         price: data.price.toString(),
+        status: data.status,
         promotePrice: data.promotePrice?.toString(),
         imageUrl: data.imageUrl,
       });
@@ -237,6 +254,38 @@ export const UpdateProductPage = () => {
                   )}
                 />
               </div>
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>Status</FormLabel>
+                    <FormControl>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Select a status" />
+                        </SelectTrigger>
+                        <SelectContent ref={field.ref}>
+                          <SelectGroup>
+                            <SelectLabel>Status</SelectLabel>
+                            {Object.entries(statusRender).map(
+                              ([key, value]) => (
+                                <SelectItem key={key} value={key}>
+                                  {value}
+                                </SelectItem>
+                              )
+                            )}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="imageUrl"

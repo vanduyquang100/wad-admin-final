@@ -33,6 +33,15 @@ export interface GetRevenueInTimeRange {
   end: number;
 }
 
+export interface GetProductRevenueInTimeRange {
+  start: number;
+  end: number;
+}
+
+export interface GetUserOrders {
+  userId: string;
+}
+
 export interface RevenueDate {
   date: string;
   revenue: number;
@@ -41,6 +50,15 @@ export interface RevenueDate {
 export interface GetRevenueInTimeRangeResponse {
   totalRevenue: RevenueDate[];
 }
+
+export type GetProductRevenueInTimeRangeResponse = {
+  _id: string;
+  name: string;
+  price: number;
+  totalRevenue: number;
+}[];
+
+export type UserOrderResponse = Order[];
 
 class OrderService {
   async getAllOrders(filter: GetAllOrdersFilters): Promise<AllOrdersResponse> {
@@ -80,6 +98,26 @@ class OrderService {
       }
     )
 
+    return result.data;
+  }
+
+  async getProductRevenueInRange(request: GetProductRevenueInTimeRange): Promise<GetProductRevenueInTimeRangeResponse> {
+    const result = await axiosInstance.get<GetProductRevenueInTimeRangeResponse>(
+      API_ROUTES.GET_PRODUCT_REVENUE,
+      {
+        params: {
+          ...request
+        }
+      }
+    )
+
+    return result.data;
+  }
+
+  async getOrdersOfAUser(request: GetUserOrders): Promise<UserOrderResponse> {
+    const result = await axiosInstance.get<UserOrderResponse>(
+      API_ROUTES.GET_USER_ORDERS.replace(":userId", request.userId)
+    )
     return result.data;
   }
 }
