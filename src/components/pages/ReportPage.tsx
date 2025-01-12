@@ -35,7 +35,7 @@ const timeRangeValues: Record<TimeRange, [number, number]> = {
   [TimeRange.THIS_YEAR]: [today - 86400000 * 365, today],
 };
 
-export const UserListPage = () => {
+export const ReportPage = () => {
   const [timeRangeEnum, setTimeRangeEnum] = useState<TimeRange>(
     TimeRange.THIS_WEEK
   );
@@ -109,4 +109,4 @@ export const UserListPage = () => {
   );
 };
 
-export default UserListPage;
+export default ReportPage;
