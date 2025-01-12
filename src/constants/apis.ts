@@ -18,6 +18,7 @@ export const API_ROUTES = {
   GET_REVENUE: 'orders/revenue',
   GET_PRODUCT_REVENUE: 'products/revenue',
   GET_USER_ORDERS: '/orders/users/:userId',
+  UPLOAD_IMAGE: 'images/upload',
 };
 
 export const NAVIGATION_ROUTES = {

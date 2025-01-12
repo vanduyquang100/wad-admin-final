@@ -17,6 +17,7 @@ type Product = {
   promotePrice?: number;
   category: string;
   imageUrl: string;
+  otherImages: string[];
   createdAt: string;
   updatedAt: string;
   stock: number;

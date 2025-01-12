@@ -22,9 +22,15 @@ import {
 } from "@/components/ui";
 import { useNavigate, useParams } from "react-router-dom";
 import { NAVIGATION_ROUTES } from "@/constants/apis";
-import { useCallback, useEffect } from "react";
-import { useUpdateProduct, useProductDetail } from "@/hooks";
+import { useCallback, useEffect, useRef } from "react";
+import {
+  useUpdateProduct,
+  useProductDetail,
+  useUploadImageAsync,
+} from "@/hooks";
+import { useUploadImage } from "@/hooks/useUploadImage";
 import { ProductStatus } from "@/constants/enums/product";
+import { LoaderCircle } from "lucide-react";
 
 const statusRender: Record<ProductStatus, string> = {
   [ProductStatus.ON_STOCK]: "On stock",
@@ -58,18 +64,20 @@ const formSchema = z.object({
     })
     .optional(),
   imageUrl: z.string().url("Invalid Image URL").optional(),
-  productImages: z.string().array().optional().optional(),
+  otherImages: z.string().array().optional().default([]),
 });
 
 export const UpdateProductPage = () => {
   const navigate = useNavigate();
   const { id = "" } = useParams();
   const { data } = useProductDetail({ id });
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       description: "",
+      otherImages: [],
     },
   });
 
@@ -87,6 +95,7 @@ export const UpdateProductPage = () => {
         status: data.status,
         promotePrice: data.promotePrice?.toString(),
         imageUrl: data.imageUrl,
+        otherImages: data.otherImages,
       });
     }
   }, [data, reset]);
@@ -102,11 +111,45 @@ export const UpdateProductPage = () => {
     },
   });
 
+  const { mutate: uploadImage, isLoading: isUploading } = useUploadImage({
+    successCallBackFn: (data) => {
+      form.setValue("imageUrl", data.link, { shouldDirty: true });
+    },
+    errorCallbackFn: (message) => {
+      console.error("Upload failed:", message);
+    },
+  });
+
+  const { uploadImageAsync: uploadOtherImage, isLoading: isOtherUploading } =
+    useUploadImageAsync({});
+
   const handleCancel = useCallback(() => {
     navigate(NAVIGATION_ROUTES.PRODUCTS);
   }, [navigate]);
 
-  // 2. Define a submit handler.
+  const handleOtherImagesUpload = async (files: FileList) => {
+    try {
+      const uploadPromises = Array.from(files).map(async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        const data = await uploadOtherImage(formData);
+        return data.link;
+      });
+
+      const imageLinks = await Promise.all(uploadPromises);
+
+      const validLinks = imageLinks.filter((link) => link !== undefined);
+      const existingImages = form.getValues().otherImages ?? [];
+
+      form.setValue("otherImages", [...existingImages, ...validLinks], {
+        shouldDirty: true,
+      });
+    } catch (error) {
+      console.error("An error occurred during the upload:", error);
+    }
+  };
+
+  // Submit handler
   function onSubmit(values: z.infer<typeof formSchema>) {
     mutate({
       id,
@@ -291,23 +334,103 @@ export const UpdateProductPage = () => {
                 name="imageUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Image URL</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="text-sm"
-                        placeholder="Enter the image URL"
-                        {...field}
+                    <FormLabel>Image</FormLabel>
+                    <div className="flex space-x-2 items-center h-fit">
+                      <img
+                        src={field.value}
+                        alt="Uploaded"
+                        className="max-w-20 h-auto"
                       />
-                    </FormControl>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        ref={fileInputRef}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const formData = new FormData();
+                            formData.append("file", file);
+                            uploadImage(formData);
+                          }
+                        }}
+                      />
+                      <div
+                        className="border border-dashed p-4 cursor-pointer min-h-full rounded-lg"
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          const file = e.dataTransfer.files[0];
+                          if (file) {
+                            const formData = new FormData();
+                            formData.append("file", file);
+                            uploadImage(formData);
+                          }
+                        }}
+                        onClick={() => fileInputRef.current?.click()}
+                        onDragOver={(e) => e.preventDefault()}
+                      >
+                        {isUploading ? (
+                          <div className="flex space-x-2 items-center">
+                            <LoaderCircle className="animate-spin" />
+                            <p>Uploading...</p>
+                          </div>
+                        ) : (
+                          <p>Drag & drop an image here or click to upload.</p>
+                        )}
+                      </div>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              {!!form.formState.errors.root && (
-                <p className="text-red-500 text-sm text-center">
-                  {form.formState.errors.root.message}
-                </p>
-              )}
+              <FormField
+                control={form.control}
+                name="otherImages"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Additional Images</FormLabel>
+                    <div className="flex flex-wrap gap-4">
+                      {field.value.map((url, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={url}
+                            alt={`Other image ${index + 1}`}
+                            className="w-20 h-20 object-cover rounded-md"
+                          />
+                          <button
+                            type="button"
+                            className="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100"
+                            onClick={() => {
+                              const updated = [...(field.value ?? [])];
+                              updated.splice(index, 1);
+                              form.setValue("otherImages", updated, {
+                                shouldDirty: true,
+                              });
+                            }}
+                          >
+                            &times;
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    {isOtherUploading ? (
+                      <LoaderCircle className="animate-spin" />
+                    ) : (
+                      <input
+                        type="file"
+                        accept="image/*"
+                        content="Add additional images"
+                        multiple
+                        onChange={(e) =>
+                          handleOtherImagesUpload(e.target.files!)
+                        }
+                        className="mt-2"
+                      />
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <div className="flex justify-left pt-4 space-x-4">
                 <Button variant="outline" onClick={handleCancel}>
                   Cancel

@@ -15,8 +15,10 @@ import {
 } from "@/components/ui";
 import { useNavigate } from "react-router-dom";
 import { NAVIGATION_ROUTES } from "@/constants/apis";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useCreateProduct } from "@/hooks/useCreateProduct";
+import { useUploadImageAsync } from "@/hooks";
+import { LoaderCircle } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string(),
@@ -34,6 +36,7 @@ const formSchema = z.object({
   }),
   imageUrl: z.string().url("Invalid Image URL"),
   productImages: z.string().array().optional(),
+  otherImages: z.string().array().optional().default([]),
 });
 
 export const CreateProductPage = () => {
@@ -43,8 +46,37 @@ export const CreateProductPage = () => {
     defaultValues: {
       name: "",
       description: "",
+      otherImages: [],
     },
   });
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const { uploadImageAsync: uploadMainImage, isLoading: isMainUploading } =
+    useUploadImageAsync({});
+  const { uploadImageAsync: uploadOtherImage, isLoading: isOtherUploading } =
+    useUploadImageAsync({});
+
+  const handleOtherImagesUpload = async (files: FileList) => {
+    try {
+      const uploadPromises = Array.from(files).map(async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        const data = await uploadOtherImage(formData);
+        return data.link;
+      });
+
+      const imageLinks = await Promise.all(uploadPromises);
+
+      const validLinks = imageLinks.filter((link) => link !== undefined);
+      const existingImages = form.getValues().otherImages ?? [];
+
+      form.setValue("otherImages", [...existingImages, ...validLinks], {
+        shouldDirty: true,
+      });
+    } catch (error) {
+      console.error("An error occurred during the upload:", error);
+    }
+  };
 
   const { mutate } = useCreateProduct({
     successCallBackFn: () => {
@@ -213,14 +245,108 @@ export const CreateProductPage = () => {
                 name="imageUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Image URL</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="text-sm"
-                        placeholder="Enter the image URL"
-                        {...field}
+                    <FormLabel>Image</FormLabel>
+                    <div className="flex space-x-2 items-center h-fit">
+                      <img
+                        src={field.value}
+                        alt="Uploaded"
+                        className="max-w-20 h-auto"
                       />
-                    </FormControl>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        ref={fileInputRef}
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const formData = new FormData();
+                            formData.append("file", file);
+                            const { link } = await uploadMainImage(formData);
+                            if (link) {
+                              form.setValue("imageUrl", link, {
+                                shouldDirty: true,
+                              });
+                            }
+                          }
+                        }}
+                      />
+                      <div
+                        className="border border-dashed p-4 cursor-pointer min-h-full rounded-lg"
+                        onDrop={async (e) => {
+                          e.preventDefault();
+                          const file = e.dataTransfer.files[0];
+                          if (file) {
+                            const formData = new FormData();
+                            formData.append("file", file);
+                            const { link } = await uploadMainImage(formData);
+                            if (link) {
+                              form.setValue("imageUrl", link, {
+                                shouldDirty: true,
+                              });
+                            }
+                          }
+                        }}
+                        onClick={() => fileInputRef.current?.click()}
+                        onDragOver={(e) => e.preventDefault()}
+                      >
+                        {isMainUploading ? (
+                          <div className="flex space-x-2 items-center">
+                            <LoaderCircle className="animate-spin" />
+                            <p>Uploading...</p>
+                          </div>
+                        ) : (
+                          <p>Drag & drop an image here or click to upload.</p>
+                        )}
+                      </div>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="otherImages"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Additional Images</FormLabel>
+                    <div className="flex flex-wrap gap-4">
+                      {field.value.map((url, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={url}
+                            alt={`Other image ${index + 1}`}
+                            className="w-20 h-20 object-cover rounded-md"
+                          />
+                          <button
+                            type="button"
+                            className="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100"
+                            onClick={() => {
+                              const updated = [...(field.value ?? [])];
+                              updated.splice(index, 1);
+                              form.setValue("otherImages", updated, {
+                                shouldDirty: true,
+                              });
+                            }}
+                          >
+                            &times;
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    {isOtherUploading ? (
+                      <LoaderCircle className="animate-spin" />
+                    ) : (
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={(e) =>
+                          handleOtherImagesUpload(e.target.files!)
+                        }
+                        className="mt-2"
+                      />
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
