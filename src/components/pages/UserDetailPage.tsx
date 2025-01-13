@@ -1,6 +1,7 @@
 import {
   Badge,
   BasicLayout,
+  Button,
   Table,
   TableBody,
   TableCell,
@@ -8,14 +9,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui";
-import { useGetUser, useUserOrders } from "@/hooks";
+import {
+  useGetUser,
+  useUpdateOtherUser,
+  useUserInfoContext,
+  useUserOrders,
+} from "@/hooks";
 import { Link, useParams } from "react-router-dom";
 import LoadingPage from "./LoadingPage";
 import { NAVIGATION_ROUTES } from "@/constants/apis";
 import { formatPrice } from "@/lib/utils";
+import { UserRoles } from "@/constants/global";
+
+const roleOrders: Record<UserRoles, number> = {
+  [UserRoles.ADMIN]: 1,
+  [UserRoles.USER]: 0,
+};
 
 const UserDetailPage = () => {
   const { id = "" } = useParams();
+  const { user } = useUserInfoContext();
+  const { mutate } = useUpdateOtherUser();
   const { data, isFetching } = useGetUser({
     id: id,
     options: {
@@ -34,7 +48,7 @@ const UserDetailPage = () => {
     return <LoadingPage />;
   }
 
-  if (!data) {
+  if (!data || !user) {
     return (
       <div className="flex w-full h-full items-center justify-center">
         No Data
@@ -42,12 +56,58 @@ const UserDetailPage = () => {
     );
   }
 
+  const banUser = () => {
+    if (!!data.bannedTimestamp) {
+      mutate({
+        _id: data._id,
+        bannedTimestamp: null,
+      });
+      return;
+    }
+    mutate({
+      _id: data._id,
+      bannedTimestamp: Date.now(),
+    });
+  };
+
+  const switchUserRole = () => {
+    if (data.roles.includes(UserRoles.ADMIN)) {
+      mutate({
+        _id: data._id,
+        roles: data.roles.filter((r) => r !== UserRoles.ADMIN),
+      });
+      return;
+    }
+    mutate({
+      _id: data._id,
+      roles: [...data.roles, UserRoles.ADMIN],
+    });
+  };
+
   return (
     <BasicLayout className="p-8 w-full">
-      <h1 className="text-left">User Detail</h1>
+      <div className="flex justify-between">
+        <h1 className="text-left">User Detail</h1>
+        {data._id !== user._id && (
+          <Button variant="destructive" onClick={banUser}>
+            {data.bannedTimestamp ? "Unban Account" : "Ban Account"}
+          </Button>
+        )}
+      </div>
       <div className="my-12">
-        <section className="flex space-x-10">
-          <img src={data.profilePic} alt="Profile" />
+        <section className="flex space-x-4 items-center">
+          <div className="w-24 h-24 relative">
+            <img
+              className="rounded-full w-24 h-24"
+              src={data.profilePic}
+              alt="Profile"
+            />
+            {!!data.bannedTimestamp && (
+              <p className="rounded-lg px-8 py-2 bg-black text-white font-bold rotate-45 absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 origin-center">
+                Banned
+              </p>
+            )}
+          </div>
           <div>
             <p className="text-md font-bold">{data.name}</p>
             <p className="text-sm text-gray-600">{data.email}</p>
@@ -55,12 +115,31 @@ const UserDetailPage = () => {
         </section>
         <hr className="my-8" />
         <section className="my-8 space-y-2">
-          <p>
-            <span className="font-bold">Roles:&nbsp;</span>{" "}
-            <Badge variant="secondary" className="text-xs font-medium">
-              {data.roles}
-            </Badge>
-          </p>
+          <div className="flex space-x-4 items-center justify-between">
+            <div>
+              <span className="font-bold">Roles:&nbsp;</span>{" "}
+              <Badge variant="secondary" className="text-xs font-medium">
+                {data.roles
+                  .sort((r1, r2) =>
+                    roleOrders[r1 as UserRoles] < roleOrders[r2 as UserRoles]
+                      ? 1
+                      : -1
+                  )
+                  .at(0)}
+              </Badge>
+            </div>
+            {data.roles && (
+              <Button
+                variant="outline"
+                className="ml-auto"
+                onClick={switchUserRole}
+              >
+                {data.roles.includes(UserRoles.ADMIN)
+                  ? "Downgrade role"
+                  : "Promote to admin"}
+              </Button>
+            )}
+          </div>
           <p>
             <span className="font-bold">Created at:&nbsp;</span>{" "}
             {new Date(data.createdAt).toLocaleString()}

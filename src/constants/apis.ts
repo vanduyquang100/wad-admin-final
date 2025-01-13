@@ -5,6 +5,7 @@ export const API_ROUTES = {
   ME: 'users/me',
   ALL_USERS: 'users',
   GET_USER: 'users/:id',
+  PUT_ME: 'users/me',
   UPDATE_USER: 'users/:id',
   ALL_PRODUCTS: 'products',
   CREATE_PRODUCT: 'products',
@@ -24,6 +25,7 @@ export const API_ROUTES = {
 export const NAVIGATION_ROUTES = {
   LOGIN: '/login',
   DASHBOARD: '/dashboard',
+  ME: '/me',
   USERS: '/dashboard/users',
   USER_DETAIL: '/dashboard/users/:id',
   PRODUCTS: '/dashboard/products',

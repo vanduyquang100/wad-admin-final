@@ -12,3 +12,5 @@ export * from './useGetUser';
 export * from './useUserOrders';
 export * from './useUploadImage';
 export * from './useUploadImageAsync';
+export * from './useUpdateUser';
+export * from './useUpdateOtherUser';
