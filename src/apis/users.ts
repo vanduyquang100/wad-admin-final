@@ -17,6 +17,14 @@ export interface GetUserRequest {
   id: string;
 }
 
+export interface UdateUserRequest {
+  name: string;
+  profilePic: string;
+}
+
+export interface UdateOtherUserRequest extends Omit<Partial<User>, "_id"> {
+  _id: string;
+}
 export interface AllUserResponse {
   total: number;
   page: number;
@@ -26,6 +34,7 @@ export interface AllUserResponse {
 }
 
 export interface GetUserResponse extends User { }
+export interface UpdateUserResponse extends User { }
 
 class UserService {
   async getAllUsers(filter: GetAllUserFilters): Promise<AllUserResponse> {
@@ -42,6 +51,25 @@ class UserService {
   async getUser(request: GetUserRequest): Promise<GetUserResponse> {
     const result = await axiosInstance.get<GetUserResponse>(
       API_ROUTES.GET_USER.replace(":id", request.id),
+    )
+
+    return result.data;
+  }
+
+  async updateUser(request: Partial<UdateUserRequest>): Promise<UpdateUserResponse> {
+    const result = await axiosInstance.put<UpdateUserResponse>(
+      API_ROUTES.PUT_ME, request
+    )
+
+    return result.data;
+  }
+
+  async updateOtherUser(request: UdateOtherUserRequest): Promise<UpdateUserResponse> {
+    const { _id, ...rest } = request;
+    const result = await axiosInstance.put<UpdateUserResponse>(
+      API_ROUTES.UPDATE_USER.replace(":id", request._id), {
+      ...rest
+    }
     )
 
     return result.data;

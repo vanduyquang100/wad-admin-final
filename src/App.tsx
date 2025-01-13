@@ -26,12 +26,14 @@ const UpdateProductPage = lazy(
 const OrderDetailPage = lazy(
   () => import("@/components/pages/OrderDetailPage")
 );
+const MyInfoPage = lazy(() => import("@/components/pages/MyInfoPage"));
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" Component={PrivateWrapper}>
+          <Route path={NAVIGATION_ROUTES.ME} Component={MyInfoPage} />
           <Route path={NAVIGATION_ROUTES.DASHBOARD} Component={DashboardLayout}>
             <Route
               path={NAVIGATION_ROUTES.DASHBOARD}

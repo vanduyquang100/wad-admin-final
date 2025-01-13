@@ -27,6 +27,7 @@ import {
 } from "@/components/ui";
 import { useUserInfoContext } from "@/hooks";
 import { NAVIGATION_ROUTES } from "@/constants/apis";
+import { Link } from "react-router-dom";
 
 const items = [
   {
@@ -91,10 +92,14 @@ export const DashboardSidebar: SidebarComponentType = () => {
                   className="w-[--radix-popper-anchor-width]"
                 >
                   <DropdownMenuItem>
-                    <span>Account</span>
+                    <Link className="w-full" to={NAVIGATION_ROUTES.ME}>
+                      <span>Account</span>
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <span>Sign out</span>
+                    <Link className="w-full" to={NAVIGATION_ROUTES.LOGIN}>
+                      <span>Sign out</span>
+                    </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
