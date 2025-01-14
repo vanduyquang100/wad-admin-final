@@ -90,58 +90,66 @@ export const OrderDetailPage = () => {
           </div>
         ))}
         <hr className="my-4" />
-        <div className="flex space-x-4 items-center justify-between">
-          <div className="flex space-x-4 items-center">
-            <p>Status</p>
-            <Badge>{order.status}</Badge>
-            {editStatusValue === undefined && (
-              <Button
-                className=" min-h-0 py-1"
-                variant="ghost"
-                title="Edit Status"
-                onClick={handleStartingToEdit}
-              >
-                <Pencil />
-              </Button>
+        <div className="flex justify-between">
+          <div className="flex space-x-4 items-center justify-between">
+            <div className="flex space-x-4 items-center">
+              <p>Status</p>
+              <Badge>{order.status}</Badge>
+              {editStatusValue === undefined && (
+                <Button
+                  className=" min-h-0 py-1"
+                  variant="ghost"
+                  title="Edit Status"
+                  onClick={handleStartingToEdit}
+                >
+                  <Pencil />
+                </Button>
+              )}
+            </div>
+            {editStatusValue !== undefined && (
+              <div className="ml-auto flex space-x-4 items-center">
+                <Select
+                  value={editStatusValue}
+                  onValueChange={(value) =>
+                    setEditStatusValue(
+                      value as unknown as Exclude<
+                        FilterCategory,
+                        FilterCategory.ALL
+                      >
+                    )
+                  }
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select a status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Status</SelectLabel>
+                      {Object.entries(FilterCategory)
+                        .filter(([_, value]) => value !== FilterCategory.ALL)
+                        .map(([key, value]) => (
+                          <SelectItem key={key} value={value}>
+                            {value}
+                          </SelectItem>
+                        ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <div className="flex space-x-4 my-2 items-center">
+                  <Button variant="secondary" onClick={handleAbortEdit}>
+                    Cancel
+                  </Button>
+                  <Button variant="default" onClick={handleConfirmEdit}>
+                    Save
+                  </Button>
+                </div>
+              </div>
             )}
           </div>
-          {editStatusValue !== undefined && (
-            <div className="ml-auto flex space-x-4 items-center">
-              <Select
-                value={editStatusValue}
-                onValueChange={(value) =>
-                  setEditStatusValue(
-                    value as unknown as Exclude<
-                      FilterCategory,
-                      FilterCategory.ALL
-                    >
-                  )
-                }
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select a status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Status</SelectLabel>
-                    {Object.entries(FilterCategory)
-                      .filter(([_, value]) => value !== FilterCategory.ALL)
-                      .map(([key, value]) => (
-                        <SelectItem key={key} value={value}>
-                          {value}
-                        </SelectItem>
-                      ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              <div className="flex space-x-4 my-2 items-center">
-                <Button variant="secondary" onClick={handleAbortEdit}>
-                  Cancel
-                </Button>
-                <Button variant="default" onClick={handleConfirmEdit}>
-                  Save
-                </Button>
-              </div>
+          {!!order.address && (
+            <div className="flex flex-col items-end">
+              <div className="font-semibold">Deliver to </div>
+              <div className="flex justify-between">{order.address}</div>
             </div>
           )}
         </div>

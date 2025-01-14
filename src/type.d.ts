@@ -45,7 +45,7 @@ type Order = {
 }
 
 type OrderDetail = {
-  address?: Record<string, string>;
+  address?: string;
   _id: string;
   userId: {
     _id: string;
