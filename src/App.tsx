@@ -33,6 +33,10 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" Component={PrivateWrapper}>
+          <Route
+            path="/"
+            element={<Navigate to={NAVIGATION_ROUTES.DASHBOARD} />}
+          />
           <Route path={NAVIGATION_ROUTES.ME} Component={MyInfoPage} />
           <Route path={NAVIGATION_ROUTES.DASHBOARD} Component={DashboardLayout}>
             <Route
